@@ -22,7 +22,7 @@ struct Compare
   }
 };
 
-std::unordered_map<char, int>
-getFrequency(const std::string &filename);
+std::unordered_map<char, int> getFrequency(const std::string &filename);
+Node *buildTree(std::unordered_map<char, int> freq);
 
 #endif
