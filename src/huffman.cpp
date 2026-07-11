@@ -40,3 +40,16 @@ Node *buildTree(std::unordered_map<char, int> freq)
 
   return pq.top();
 }
+
+void generateCodes(Node *node, std::string code, std::unordered_map<char, std::string> &table)
+{
+  if (node == nullptr)
+    return;
+  if (node->right == nullptr && node->left == nullptr)
+  {
+    table[node->ch] = code;
+    return;
+  }
+  generateCodes(node->left, code + "0", table);
+  generateCodes(node->right, code + "1", table);
+}
