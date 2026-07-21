@@ -1,6 +1,7 @@
 #include "huffman.h"
 #include <fstream>
 #include <queue>
+#include <iostream>
 
 std::unordered_map<char, int> getFrequency(const std::string &filename)
 {
@@ -41,15 +42,48 @@ Node *buildTree(std::unordered_map<char, int> freq)
   return pq.top();
 }
 
-void generateCodes(Node *node, std::string code, std::unordered_map<char, std::string> &table)
+void generateCodes(Node *treenode, std::string code, std::unordered_map<char, std::string> &table)
 {
-  if (node == nullptr)
+  if (treenode == nullptr)
     return;
-  if (node->right == nullptr && node->left == nullptr)
+  if (treenode->right == nullptr && treenode->left == nullptr)
   {
-    table[node->ch] = code;
+    table[treenode->ch] = code;
     return;
   }
-  generateCodes(node->left, code + "0", table);
-  generateCodes(node->right, code + "1", table);
+  generateCodes(treenode->left, code + "0", table);
+  generateCodes(treenode->right, code + "1", table);
+}
+
+void encode(const std::string inFile, std::string outFile, std::unordered_map<char, std::string> table)
+{
+  std::ifstream file(inFile, std::ios::binary);
+  std::ofstream out(outFile, std::ios::binary);
+  std::unordered_map<char, int> freq;
+
+  char ch;
+  int buffer{};
+  int bitCount{};
+
+  while (file.get(ch))
+  {
+    std::string code = table[ch];
+    for (int i{}; i < code.length(); i++)
+    {
+      buffer = (buffer << 1) | (code[i] - '0');
+      bitCount++;
+      if (bitCount == 8)
+      {
+        out.put(static_cast<char>(buffer));
+        buffer = 0;
+        bitCount = 0;
+      }
+    }
+  }
+  if (bitCount > 0)
+  {
+    buffer = buffer << (8 - bitCount);
+    out.put(static_cast<char>(buffer));
+  }
+  file.close();
 }
